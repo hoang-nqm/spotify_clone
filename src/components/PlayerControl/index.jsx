@@ -17,7 +17,6 @@ export default function PlayerControl() {
     await axios.post(
       `https://api.spotify.com/v1/me/player/${type}`,
       {},
-
       {
         headers: {
           Authorization: "Bearer " + token,
@@ -25,7 +24,8 @@ export default function PlayerControl() {
         },
       }
     );
-    const response = await axios.get(
+    dispatch({ type: reducerCases.SET_PLAYER_STATE, playerState: true });
+    const response1 = await axios.get(
       "https://api.spotify.com/v1/me/player/currently-playing",
       {
         headers: {
@@ -35,21 +35,34 @@ export default function PlayerControl() {
       }
     );
 
-    const changeState = async () => {
-      const state = playerState ? "pause" : "play";
-    };
-
-    if (response.data !== "") {
-      const item = response.data.item;
+    if (response1.data !== "") {
       const currentlyPlaying = {
-        id: item.id,
-        name: item.name,
-        artists: item.artists.map((artist) => artist.name),
-        image: item.album.images[2].url,
+        id: response1.data.item.id,
+        name: response1.data.item.name,
+        artists: response1.data.item.artists.map((artist) => artist.name),
+        image: response1.data.item.album.images[2].url,
       };
       dispatch({ type: reducerCases.SET_PLAYING, currentlyPlaying });
     } else dispatch({ type: reducerCases.SET_PLAYING, currentlyPlaying: null });
   };
+  const changeState = async () => {
+    const state = playerState ? "pause" : "play";
+    await axios.put(
+      `https://api.spotify.com/v1/me/player/${state}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+    dispatch({
+      type: reducerCases.SET_PLAYER_STATE,
+      playerState: !playerState,
+    });
+  };
+
   return (
     <div className="playerControl">
       <div className="shuffle">
@@ -59,7 +72,11 @@ export default function PlayerControl() {
         <CgPlayTrackPrev onClick={() => changeTrack("previous")} />
       </div>
       <div className="state">
-        {playerState ? <BsFillPauseCircleFill /> : <BsFillPlayCircleFill />}
+        {playerState ? (
+          <BsFillPauseCircleFill onClick={changeState} />
+        ) : (
+          <BsFillPlayCircleFill onClick={changeState} />
+        )}
       </div>
       <div className="next">
         <CgPlayTrackNext onClick={() => changeTrack("next")} />

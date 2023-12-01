@@ -26,11 +26,18 @@ export default function Playlist() {
     };
     getPlaylistData();
   }, [token, dispatch]);
+  const changeCurrentPlaylist = (selectedPlaylistId) => {
+    dispatch({ type: reducerCases.SET_PLAYLIST_ID, selectedPlaylistId });
+  };
   return (
     <div className="playLists">
       <ul>
         {playlists.map(({ name, id }) => {
-          return <li key={id}>{name}</li>;
+          return (
+            <li key={id} onClick={() => changeCurrentPlaylist(id)}>
+              {name}
+            </li>
+          );
         })}
       </ul>
     </div>

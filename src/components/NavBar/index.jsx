@@ -5,7 +5,7 @@ import { CgProfile } from "react-icons/cg";
 import { useStateProvider } from "../../utils/StateProvider";
 export default function Navbar({ navBackground }) {
   const [{ userInfo }] = useStateProvider();
-  console.log(navBackground);
+
   return (
     <div
       className={navBackground ? "navBar bgBlue" : "navBar bgGreen"}
